@@ -1,0 +1,9 @@
+/.eslintrc*
+/.vscode
+/public/*.js
+!/public/bundle.js
+*.tgz
+
+# Nix stuff
+/*.nix
+/result*

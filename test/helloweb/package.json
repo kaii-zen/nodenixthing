@@ -1,0 +1,25 @@
+{
+  "name": "helloweb",
+  "bin": {
+    "helloweb": "./index.js"
+  },
+  "version": "1.0.0",
+  "description": "Says hello to the Web",
+  "license": "ISC",
+  "repository": "https://github.com/kreisys/hello",
+  "scripts": {
+    "start": "node .",
+    "prepare": "browserify -t cssify public/script.js -o public/bundle.js"
+  },
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "canvas": "^1.6.4",
+    "express": "^4.16.2",
+    "grpc": "^1.9.1"
+  },
+  "devDependencies": {
+    "browserify": "^16.1.0",
+    "cssify": "^1.0.3",
+    "lodash": "^4.17.5"
+  }
+}

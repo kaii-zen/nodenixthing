@@ -1,0 +1,8 @@
+/.eslintrc*
+/.vscode
+/src
+*.tgz
+
+# Nix stuff
+/*.nix
+/result*

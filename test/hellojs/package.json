@@ -1,0 +1,21 @@
+{
+  "name": "hello",
+  "bin": {
+    "hello": "./index.js"
+  },
+  "version": "1.0.0",
+  "description": "Says hello",
+  "license": "ISC",
+  "repository": "https://github.com/kreisys/hello",
+  "scripts": {
+    "prepare": "gulp --color"
+  },
+  "dependencies": {
+    "chalk": "^2.3.1",
+    "ora": "^1.4.0"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-coffee": "^3.0.2"
+  }
+}

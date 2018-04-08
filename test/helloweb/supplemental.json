@@ -1,0 +1,7 @@
+{
+  "canvas": {
+    "1.6.4": {
+      "buildInputs": [ "pkgconfig", "cairo", "pango", "libpng", "libjpeg", "giflib" ]
+    }
+  }
+}
