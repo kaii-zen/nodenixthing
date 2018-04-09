@@ -22,7 +22,7 @@ let
     mkdir -p $moduleDir
     # hack for @scoped/packages
     rmdir $moduleDir
-    ${copyDirectory attrs.built "$moduleDir"}
+    ${copyDirectory attrs.path "$moduleDir"}
   '';
 
   mkUntarPackageScriptlet = name: version: attrs: ''
@@ -53,7 +53,7 @@ let
 
   mkScript = { scriptletGenerator }: mkParallelScript (mapPackagesToList scriptletGenerator dependencies);
 
-  copyScript    = mkScript { scriptletGenerator = mkCopyPackageScriptlet; };
+  copyAllDeps   = mkScript { scriptletGenerator = mkCopyPackageScriptlet; };
   untarAllDeps  = mkScript { scriptletGenerator = mkUntarPackageScriptlet; };
   linkAllDeps   = mkScript { scriptletGenerator = mkLinkPackageScriptlet; };
   linkAllBins   = mkScript { scriptletGenerator = mkLinkAllBinsScriptlet; };
@@ -114,7 +114,7 @@ let
   '';
 
   copyBundled = let
-    src = if self ? extracted then "${self.extracted}/lib/node_modules/${name}" else self.src;
+    src = if self ? src then self.src else "${self.extracted}/lib/node_modules/${name}";
   in ''
     if [[ -d ${src}/node_modules ]]; then
       cp -r ${src}/node_modules/* $outPath/node_modules
@@ -124,4 +124,4 @@ let
 in runCommand "node-${drvName}-${drvVersion}-modules" {} (''
   export outPath="$out/lib"
   mkdir -p $outPath
-'' + untarAllDeps + copyBundled + linkAllDeps + linkOwnDeps + linkAllBins + linkOwnBins + handlePeers)
+'' + copyAllDeps + copyBundled + linkAllDeps + linkOwnDeps + linkAllBins + linkOwnBins + handlePeers)

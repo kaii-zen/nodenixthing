@@ -15,8 +15,20 @@ let
     mkNodeModules = callPackage ./voodoo.nix {};
   in optionalAttrs needNodeModules {
     nodeModules = mkNodeModules {
-      inherit name version context;
+      inherit name version;
+      context = augmentedContext;
     };
+  };
+
+  extract = self: super: let
+    inherit (self) name drvName drvVersion;
+  in optionalAttrs (!(super ? self) && super ? npmPackage) {
+    extracted = runCommand "node-${drvName}-${drvVersion}" { inherit (super) npmPackage; buildInputs = [ nodejs-8_x ]; } ''
+      export outPath="$out/lib/node_modules/${name}"
+      mkdir -p $outPath
+      tar xf $npmPackage --warning=no-unknown-keyword --directory $outPath --strip-components=1
+      node ${./nix-bin.js} $outPath/package.json | xargs --max-args=3 --no-run-if-empty bash -c 'binfile=$(realpath $outPath/$3) ; chmod +x $binfile' _
+    '';
   };
 
   buildSelf = self: super: let
@@ -50,11 +62,7 @@ let
 
     extracted = let
       dependenciesNoDev = removeDev augmentedContext;
-      #selfAndNoDev = recursiveUpdate { ${name}.${version} = { inherit (self) drvName drvVersion requires name version; }; } dependenciesNoDev;
-      #selfAndNoDev = recursiveUpdate dependenciesNoDev { ${name}.${version} = { path = ""; extracted = ""; }; };
       selfAndNoDev = mapPackages (_: _: attrs: if attrs ? self then { inherit (attrs) requires; } else attrs) dependenciesNoDev;
-      drvs = mapPackagesToList (_: _: attrs: if attrs ? self then "" else attrs.path) dependenciesNoDev;
-      #selfAndNoDev = dependenciesNoDev;
 
       makeWrapperOpts = let
         env' = concatStringsSep " " (mapAttrsToList (name: value: ''
@@ -67,6 +75,7 @@ let
       name = "node-${drvName}-${drvVersion}";
       src = npmPackage;
       buildInputs = [ nodejs-8_x ];
+
       nativeBuildInputs = [ makeWrapper ];
       nixJson = toJSON selfAndNoDev;
       passAsFile = [ "nixJson" ];
@@ -78,22 +87,12 @@ let
         export binPath=$out/bin
         export nixJson="$out/nix-support/nix.json"
 
-        mkdir -p $libPath $(dirname $nixJson)
+        mkdir -p $(dirname $nixJson)
+        mkdir -p $libPath
+
+        #cat $nodeModulesPath | xargs -n1 > $out/nix-support/srcs
 
         tar xf $src --warning=no-unknown-keyword --directory $libPath --strip-components=1
-
-
-        mkdir -p $out/bin
-        cat <<EOF > $out/bin/lies
-        #!${stdenv.shell}
-        cat <<EOF_
-        ${concatStringsSep "\n" drvs}
-        EOF_
-        EOF
-
-        chmod +x $out/bin/lies
-
-
         ${concatStrings (mapAttrsToList (bin: target: ''
           mkdir -p $binPath
           target=$(realpath $libPath/${target})
@@ -116,7 +115,7 @@ let
       src = self.extracted;
       name = "${self.extracted.name}-${builtins.currentSystem}";
       propagatedBuildInputs = supplementalPropagatedBuildInputs;
-      buildInputs = [ nodejs-8_x nodeModules ] ++ supplementalBuildInputs;
+      buildInputs = [ nodejs-8_x ] ++ supplementalBuildInputs;
       phases = [ "installPhase" "fixupPhase" ];
       installPhase = ''
         ${copyDirectory "$src" "$out"}
@@ -138,7 +137,7 @@ let
     path = if isString self.built then toPath self.built else self.built;
   };
 
-  augmentedContext = extendPackages context [ installNodeModules buildNative buildSelf setPath ];
+  augmentedContext = extendPackages context [ installNodeModules extract buildNative buildSelf setPath ];
 
 in augmentedContext
 #in writeText "context.json" (toJSON augmentedContext)
