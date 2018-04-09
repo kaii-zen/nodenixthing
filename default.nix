@@ -25,6 +25,5 @@ let
   contextJson = mkContext { inherit package lock supplemental src; };
   fetchedContextJson = doMagic { inherit contextJson; };
   processedContextJson = doWitchcraft { contextJson = fetchedContextJson; };
-  builtContextJson = castSpells { contextJson = processedContextJson; inherit env; };
-  #unicorn = makeUnicorn { contextJson = builtContextJson; inherit name version env; };
-in builtContextJson.${name}.${version}.path
+  builtContext = castSpells { contextJson = processedContextJson; inherit env; };
+in builtContext.${name}.${version}.path
