@@ -62,7 +62,12 @@ let
 
     extracted = let
       dependenciesNoDev = removeDev augmentedContext;
-      selfAndNoDev = mapPackages (_: _: attrs: if attrs ? self then { inherit (attrs) requires; } else attrs) dependenciesNoDev;
+      selfAndNoDev = mapPackages (_: _: attrs:
+      if attrs ? self
+      then { inherit (attrs) requires; }
+      else { inherit (attrs) path; } //
+      optionalAttrs (attrs ? packageJsonOverride) { inherit (attrs) packageJsonOverride; } //
+      optionalAttrs (attrs ? requires) { inherit (attrs) requires; }) dependenciesNoDev;
 
       makeWrapperOpts = let
         env' = concatStringsSep " " (mapAttrsToList (name: value: ''
@@ -127,6 +132,7 @@ let
         export HOME=$TMPDIR
         npm run install
         rm node_modules
+        find -regextype posix-extended -regex '.*\.(o|mk)' -delete
       '';
     } else self.extracted;
   };
@@ -140,4 +146,3 @@ let
   augmentedContext = extendPackages context [ installNodeModules extract buildNative buildSelf setPath ];
 
 in augmentedContext
-#in writeText "context.json" (toJSON augmentedContext)
