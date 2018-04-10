@@ -1,4 +1,4 @@
-{ lib, curl, perl, writeText, stdenvNoCC, nodejs-8_x, git, openssh
+{ lib, curl, perl, writeText, stdenvNoCC, nodejs-8_x, git, openssh, cacert
 , idRsa ? ""
 , npmRc ? ""
 }:
@@ -28,6 +28,8 @@ in stdenvNoCC.mkDerivation {
   name = "node-${builtins.replaceStrings [ "#" ] [ "-" ] (baseNameOf (toString url))}";
 
   inherit npmRc idRsa;
+
+  GIT_SSL_CAINFO = "${cacert}/etc/ssl/certs/ca-bundle.crt";
 
   setupSsh = ''
     mkdir -p .ssh
