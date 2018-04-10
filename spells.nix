@@ -70,12 +70,8 @@ let
       optionalAttrs (attrs ? requires) { inherit (attrs) requires; }) dependenciesNoDev;
 
       makeWrapperOpts = let
-        env' = concatStringsSep " " (mapAttrsToList (name: value: ''
-          --set ${name} "${value}"
-        '') env);
-      in ''
-        --set NIX_JSON "$nixJson" --set NODE_OPTIONS "--require ${./nix-require.js}" ${env'}
-      '';
+        env' = concatStringsSep " " (mapAttrsToList (name: value: ''--set ${name} "${value}"'') env);
+      in ''--set NIX_JSON "$nixJson" --set NODE_OPTIONS "--require ${./nix-require.js}" ${env'}'';
     in stdenv.mkDerivation {
       name = "node-${drvName}-${drvVersion}";
       src = npmPackage;
