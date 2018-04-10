@@ -35,7 +35,7 @@ let
     inherit (self) src name version drvName drvVersion nodeModules;
     workDir = "~/src";
     supplementalBuildInputs = optionals (super ? buildInputs) super.buildInputs;
-    npmPackage = stdenv.mkDerivation {
+    npmPackage = stdenv.mkDerivation (env // {
       inherit src;
       dontStrip = true;
       name = "node-${drvName}-${drvVersion}.tgz";
@@ -58,7 +58,7 @@ let
       installPhase = ''
         cp ${drvName}-${super.packageJson.version}.tgz $out
       '';
-    };
+    });
 
     extracted = let
       dependenciesNoDev = removeDev augmentedContext;
