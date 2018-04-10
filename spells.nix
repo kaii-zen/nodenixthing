@@ -115,7 +115,7 @@ let
       src = self.extracted;
       name = "${self.extracted.name}-${builtins.currentSystem}";
       propagatedBuildInputs = supplementalPropagatedBuildInputs;
-      buildInputs = [ nodejs-8_x ] ++ supplementalBuildInputs;
+      buildInputs = [ nodejs-8_x python ] ++ supplementalBuildInputs;
       phases = [ "installPhase" "fixupPhase" ];
       installPhase = ''
         ${copyDirectory "$src" "$out"}
