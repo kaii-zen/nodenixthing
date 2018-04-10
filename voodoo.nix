@@ -115,10 +115,9 @@ let
 
   copyBundled = let
     src = if self ? src then self.src else "${self.extracted}/lib/node_modules/${name}";
-  in ''
-    if [[ -d ${src}/node_modules ]]; then
-      cp -r ${src}/node_modules/* $outPath/node_modules
-    fi
+    hasBundled = (builtins.readDir src) ? node_modules;
+  in optionalString hasBundled ''
+    cp -r ${src + "/node_modules"}/* $outPath/node_modules
   '';
 
 in runCommand "node-${drvName}-${drvVersion}-modules" {} (''
