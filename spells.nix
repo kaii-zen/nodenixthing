@@ -1,5 +1,5 @@
 { pkgs, makeWrapper, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x }:
-{ contextJson, env }:
+{ contextJson, env, npmPkgOpts }:
 
 with lib;
 with builtins;
@@ -35,7 +35,7 @@ let
     inherit (self) src name version drvName drvVersion nodeModules;
     workDir = "~/src";
     supplementalBuildInputs = optionals (super ? buildInputs) super.buildInputs;
-    npmPackage = stdenv.mkDerivation (env // {
+    npmPackage = stdenv.mkDerivation {
       inherit src;
       dontStrip = true;
       name = "node-${drvName}-${drvVersion}.tgz";
@@ -49,6 +49,9 @@ let
 
       configurePhase = ''
         ln -s ${nodeModules}/lib/node_modules node_modules
+          ${concatStrings (mapAttrsToList (name: value: ''
+            npm set ${name} "${value}"
+          '') npmPkgOpts)}
       '';
 
       buildPhase = ''
@@ -58,7 +61,7 @@ let
       installPhase = ''
         cp ${drvName}-${super.packageJson.version}.tgz $out
       '';
-    });
+    };
 
     extracted = let
       dependenciesNoDev = removeDev augmentedContext;
