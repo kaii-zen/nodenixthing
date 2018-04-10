@@ -2,10 +2,13 @@
 
 with builtins;
 rec {
-  cp = if stdenv.isDarwin then "/bin/cp -c" else "cp --reflink=auto --sparse=always";
-  copyDirectory = src: dst: ''
+  copyDirectory = src: dst:
+  if stdenv.isDarwin then ''
     mkdir -p ${dst}
-    ${cp} -r ${src}/ ${dst}
+    /bin/cp -c -r ${src}/ ${dst}
+    chmod -R u+w -- ${dst}
+  '' else ''
+    cp --reflink=auto --sparse=always -r ${src} ${dst}
     chmod -R u+w -- ${dst}
   '';
 
