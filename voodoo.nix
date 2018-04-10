@@ -22,7 +22,7 @@ let
     mkdir -p $moduleDir
     # hack for @scoped/packages
     rmdir $moduleDir
-    ${copyDirectory attrs.path "$moduleDir"}
+    ${copyDirectory "${attrs.path}/lib/node_modules/${name}" "$moduleDir"}
   '';
 
   mkUntarPackageScriptlet = name: version: attrs: ''
