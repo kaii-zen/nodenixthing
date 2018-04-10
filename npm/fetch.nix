@@ -1,4 +1,7 @@
-{ lib, curl, perl, writeText, stdenvNoCC, nodejs-8_x, git, openssh }:
+{ lib, curl, perl, writeText, stdenvNoCC, nodejs-8_x, git, openssh
+, idRsa ? ""
+, npmRc ? ""
+}:
 
 { resolved
 , integrity
@@ -24,12 +27,32 @@ in stdenvNoCC.mkDerivation {
   pname  = name;
   name = "node-${builtins.replaceStrings [ "#" ] [ "-" ] (baseNameOf (toString url))}";
 
+  inherit npmRc idRsa;
+
+  setupSsh = ''
+    mkdir -p .ssh
+    cp $idRsaPath .ssh/id_rsa
+    chmod 700 .ssh
+    chmod 600 .ssh/id_rsa
+    export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -F /dev/null"
+  '';
+
+  passAsFile = [ "idRsa" "npmRc" "setupSsh" ];
+
   buildCommand = ''
     export HOME=$TMPDIR
     set -eo pipefail
-    mkdir -p .ssh
-    chmod 700 .ssh
-    export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -F /dev/null"
+
+    function rm_secrets {
+      rm -f ~/.npmrc ~/.ssh/id_rsa ~/env-vars
+    }
+
+    trap rm_secrets EXIT
+
+    cp $npmRcPath .npmrc
+
+    source $setupSshPath
+
     tgzFile=$(npm pack $url | tail -n1)
   '' + optionalString isGit ''
     tar xzf $tgzFile

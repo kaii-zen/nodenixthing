@@ -1,4 +1,4 @@
-{ lib, writeText, callPackage, runCommand, nodejs-8_x }:
+{ lib, writeText, callPackage, runCommand, nodejs-8_x, npmFetch }:
 { contextJson }:
 
 with lib;
@@ -7,7 +7,6 @@ with (callPackage ./util.nix {});
 with (callPackage ./context/dep-map.nix {});
 let
   context = importJSON contextJson;
-  npmFetch = callPackage ./npm/fetch.nix {};
   fetch = self: super: let
     shouldFetch = hasAttrs [ "resolved" "integrity" ] super;
   in optionalAttrs shouldFetch {
