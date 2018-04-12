@@ -1,6 +1,4 @@
-{ pkgs ? import nixpkgs { inherit system; }
-, nixpkgs ? <nixpkgs>
-, system ? builtins.currentSystem
+{ pkgs ? import <nixpkgs> {}
 , npmShrinkwrapJson ? "npm-shrinkwrap.json"
 , npmPackageJson ? "package.json"
 , supplemental ? {}
