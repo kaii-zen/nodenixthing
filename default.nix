@@ -27,6 +27,6 @@ let
 
   contextJson = mkContext { inherit package lock supplemental src; };
   fetchedContextJson = doMagic { inherit contextJson; };
-  processedContextJson = doWitchcraft { contextJson = fetchedContextJson; fallback = builtins.dirName npmPackageJson; };
+  processedContextJson = doWitchcraft { contextJson = fetchedContextJson; };
   builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts; };
 in builtContext.${name}.${version}.path

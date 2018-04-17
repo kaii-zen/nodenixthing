@@ -1,5 +1,5 @@
 { pkgs, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x }:
-{ contextJson, fallback }:
+{ contextJson }:
 
 with lib;
 with builtins;
@@ -12,7 +12,7 @@ let
   extract = callPackage ./extract.nix {};
 
   importPackageJson = self: super: let
-    src = if super ? extracted then "${self.extracted}/lib/node_modules/${self.name}" else fallback;
+    src = if super ? extracted then "${self.extracted}/lib/node_modules/${self.name}" else if self ? src then self.src else abort (traceVal (attrNames self) "FUCK YOU");
     packageJson = importJSON "${src}/package.json";
     hasBindingGyp = hasAttr "binding.gyp" (builtins.readDir src);
     hasInstallScript = hasAttrByPath [ "scripts" "install" ] packageJson;
