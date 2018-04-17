@@ -75,9 +75,6 @@ let
   '';
 
   mkHandlePeersScriptlet = name: version: {packageJson,...}: let
-    # path = extracted;
-    # path = "${extracted}/${allModulesDir}/${name}/${version}/node_modules/${name}";
-    # packageJson = importJSON "${path}/package.json";
     dependencyPath = "$outPath/${allModulesDir}/${name}/${version}";
     printDependency = { peerDependencies ? {}, ... }: let
       peerNames = attrNames peerDependencies;
