@@ -1,5 +1,5 @@
 { pkgs, makeWrapper, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x }:
-{ contextJson, env, npmPkgOpts }:
+{ contextJson, env, npmPkgOpts, src }:
 
 with lib;
 with builtins;
@@ -7,7 +7,8 @@ with (callPackage ./util.nix {});
 with (callPackage ./scriptlets.nix {});
 with (callPackage ./context/dep-map.nix {});
 let
-  context = importJSON contextJson;
+  #context = importJSON contextJson;
+  context = contextJson;
 
   installNodeModules = self: super: let
     inherit (super) name version shouldCompile shouldPrepare;
@@ -20,10 +21,15 @@ let
     };
   };
 
+  addSrc = self: super: optionalAttrs (super ? self) {
+    inherit src;
+  };
+
   extract = callPackage ./extract.nix {};
 
   buildSelf = self: super: let
-    inherit (self) src name version drvName drvVersion nodeModules;
+    inherit src;
+    inherit (self) name version drvName drvVersion nodeModules;
     workDir = "~/src";
     supplementalBuildInputs = optionals (super ? buildInputs) super.buildInputs;
     npmPackage = stdenv.mkDerivation {
@@ -97,7 +103,7 @@ let
         cp $nixJsonPath $nixJson
       '';
     };
-  in optionalAttrs (super ? src) {
+  in optionalAttrs (super ? self) {
     inherit extracted;
   };
 
@@ -133,6 +139,6 @@ let
     path = if isString self.built then toPath self.built else self.built;
   };
 
-  augmentedContext = extendPackages context [ installNodeModules extract buildNative buildSelf setPath ];
+  augmentedContext = extendPackages context [ installNodeModules extract buildNative buildSelf setPath addSrc ];
 
 in augmentedContext

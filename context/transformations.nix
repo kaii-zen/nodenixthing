@@ -8,8 +8,9 @@ with (callPackage ./dep-map.nix {});
 let
   normalizeInput = self: super: {
     normalizedInput.${self.lock.name} = self.lock // {
-      inherit (self) src;
+      #inherit (self) src;
       self = true;
+      packageJson = self.package;
       requires = let
         mkRequires = { dependencies ? {}, devDependencies ? {}, optionalDependencies ? {}, ...}:
           genAttrs ((attrNames dependencies) ++ (attrNames devDependencies) ++ (attrNames optionalDependencies)) (depName: self.lock.dependencies."${depName}".version);

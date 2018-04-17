@@ -1,5 +1,5 @@
 { pkgs, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x }:
-{ contextJson }:
+{ contextJson, src }:
 
 with lib;
 with builtins;
@@ -10,14 +10,15 @@ let
   context = importJSON contextJson;
 
   extract = callPackage ./extract.nix {};
+  src' = src;
 
   importPackageJson = self: super: let
-    src = if super ? extracted then "${self.extracted}/lib/node_modules/${self.name}" else if self ? src then self.src else abort (traceVal (attrNames self) "FUCK YOU");
-    packageJson = importJSON "${src}/package.json";
+    src = if super ? extracted then "${self.extracted}/lib/node_modules/${self.name}" else src';
+    packageJson = if super ? packageJson then super.packageJson else importJSON "${src}/package.json";
     hasBindingGyp = hasAttr "binding.gyp" (builtins.readDir src);
     hasInstallScript = hasAttrByPath [ "scripts" "install" ] packageJson;
     hasPrepareScript = hasAttrByPath [ "scripts" "prepare" ] packageJson;
-    fromSource = super ? src;
+    fromSource = ! (super ? extracted);
     normalizeBin = {bin ? {},...}: if isString bin then { ${self.baseName} = bin; } else bin;
   in {
     inherit packageJson;
@@ -28,4 +29,5 @@ let
 
   augmentedContext = extendPackages context [ extract importPackageJson ];
 
-in writeText "context.json" (toJSON augmentedContext)
+in augmentedContext
+#in writeText "context.json" (toJSON augmentedContext)

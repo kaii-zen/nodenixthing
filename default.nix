@@ -1,20 +1,32 @@
 { pkgs ? import <nixpkgs> {}
-, npmShrinkwrapJson ? src + "/npm-shrinkwrap.json"
-, npmPackageJson ? src + "/package.json"
 , supplemental ? {}
 , idRsa ? ""
 , npmRc ? ""
 , npmPkgOpts ? {}
 , env ? {}
-, src }:
+, srcPath
+, srcFilter ? path: type: type != "symlink" && ! builtins.elem (baseNameOf path) [ ".git" "node_modules" ]
+}:
 
 with builtins;
 with pkgs;
 with pkgs.lib;
 with (callPackage ./util.nix {});
 let
-  package = importJSON npmPackageJson;
-  lock    = importJSON npmShrinkwrapJson;
+  src = {
+    outPath = builtins.path {
+      path = srcPath;
+      filter = srcFilter;
+    };
+
+    packageJson = srcPath + "/package.json";
+    npmShrinkwrap = srcPath + "/npm-shrinkwrap.json";
+    src = srcPath + "/npm-shrinkwrap.json";
+  };
+
+  package = importJSON src.packageJson;
+  lock    = importJSON src.npmShrinkwrap;
+
   inherit (package) name version;
 
   npmFetch = callPackage ./npm/fetch.nix { inherit idRsa npmRc; };
@@ -25,8 +37,8 @@ let
   castSpells = callPackage ./spells.nix {};
   makeUnicorn = callPackage ./unicorns.nix {};
 
-  contextJson = mkContext { inherit package lock supplemental src; };
+  contextJson = mkContext { inherit package lock supplemental; };
   fetchedContextJson = doMagic { inherit contextJson; };
-  processedContextJson = doWitchcraft { contextJson = fetchedContextJson; };
-  builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts; };
+  processedContextJson = doWitchcraft { contextJson = fetchedContextJson; src = srcPath; };
+  builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts; src = srcPath; };
 in builtContext.${name}.${version}.path
