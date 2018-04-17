@@ -5,10 +5,16 @@
   },
   "version": "1.0.0",
   "description": "Says hello",
+  "config": {
+    "meow": "cat"
+  },
   "license": "ISC",
   "repository": "https://github.com/kreisys/hello",
   "dependencies": {
     "chalk": "^2.3.1",
     "ora": "^1.4.0"
+  },
+  "scripts": {
+    "prepare": "echo $npm_package_config_meow"
   }
 }

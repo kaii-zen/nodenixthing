@@ -3,12 +3,15 @@
   "bin": {
     "hello": "./index.js"
   },
+  "config": {
+    "meow": "dog"
+  },
   "version": "1.0.0",
   "description": "Says hello",
   "license": "ISC",
   "repository": "https://github.com/kreisys/hello",
   "scripts": {
-    "prepare": "gulp --color"
+    "prepare": "echo $npm_package_config_meow && gulp --color"
   },
   "dependencies": {
     "chalk": "^2.3.1",

@@ -3,5 +3,10 @@
     "1.6.4": {
       "buildInputs": [ "pkgconfig", "cairo", "pango", "libpng", "libjpeg", "giflib" ]
     }
+  },
+  "recluster": {
+    "git://github.com/sbergmann/recluster.git#5dba0c351444cd94d7c663102c9ed05096f7e8c1": {
+      "integrity": "sha1-cakv8a0qr7cx51d23461r1p74qzgg86x"
+    }
   }
 }
