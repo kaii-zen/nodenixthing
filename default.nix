@@ -1,6 +1,6 @@
 { pkgs ? import <nixpkgs> {}
-, npmShrinkwrapJson ? "npm-shrinkwrap.json"
-, npmPackageJson ? "package.json"
+, npmShrinkwrapJson ? src + "/npm-shrinkwrap.json"
+, npmPackageJson ? src + "/package.json"
 , supplemental ? {}
 , idRsa ? ""
 , npmRc ? ""
@@ -13,8 +13,8 @@ with pkgs;
 with pkgs.lib;
 with (callPackage ./util.nix {});
 let
-  package = importJSON "${src}/${npmPackageJson}";
-  lock    = importJSON "${src}/${npmShrinkwrapJson}";
+  package = importJSON npmPackageJson;
+  lock    = importJSON npmShrinkwrapJson;
   inherit (package) name version;
 
   npmFetch = callPackage ./npm/fetch.nix { inherit idRsa npmRc; };
