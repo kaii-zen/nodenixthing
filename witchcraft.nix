@@ -9,6 +9,8 @@ with (callPackage ./context/dep-map.nix {});
 let
   context = importJSON contextJson;
 
+  extract = callPackage ./extract.nix {};
+
   importPackageJson = self: super: let
     src = if super ? extracted then "${self.extracted}/lib/node_modules/${self.name}" else self.src;
     packageJson = importJSON "${src}/package.json";
@@ -24,6 +26,6 @@ let
     bin = normalizeBin packageJson;
   };
 
-  augmentedContext = extendPackages context [ importPackageJson ];
+  augmentedContext = extendPackages context [ extract importPackageJson ];
 
 in writeText "context.json" (toJSON augmentedContext)
