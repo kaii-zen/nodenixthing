@@ -10,6 +10,15 @@ let
   #context = importJSON contextJson;
   context = contextJson;
 
+  genMeta = { contributors ? [], description ? "", ...}@packageJson:
+  assert isList contributors; {
+    meta = {
+      maintainers = contributors;
+      inherit description;
+    };
+  };
+
+
   installNodeModules = self: super: let
     inherit (super) name version shouldCompile shouldPrepare;
     needNodeModules = shouldCompile || shouldPrepare || super ? self;
@@ -58,6 +67,8 @@ let
       installPhase = ''
         cp ${drvName}-${super.packageJson.version}.tgz $out
       '';
+
+      inherit (genMeta super.packageJson) meta;
     };
 
     extracted = let
