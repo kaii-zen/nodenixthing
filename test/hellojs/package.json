@@ -6,6 +6,12 @@
   "config": {
     "meow": "dog"
   },
+  "contributors": [
+    {
+      "name": "Shay Bergmann",
+      "email": "shaybergmann@gmail.com"
+    }
+  ],
   "version": "1.0.0",
   "description": "Says hello",
   "license": "ISC",
