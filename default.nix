@@ -21,7 +21,6 @@ let
 
     packageJson = srcPath + "/package.json";
     npmShrinkwrap = srcPath + "/npm-shrinkwrap.json";
-    src = srcPath + "/npm-shrinkwrap.json";
   };
 
   package = importJSON src.packageJson;
