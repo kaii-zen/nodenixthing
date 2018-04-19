@@ -7,7 +7,6 @@ with (callPackage ./util.nix {});
 with (callPackage ./scriptlets.nix {});
 with (callPackage ./context/dep-map.nix {});
 let
-  #context = importJSON contextJson;
   context = contextJson;
 
   genMeta = { contributors ? [], description ? "", ...}@packageJson:
@@ -146,8 +145,6 @@ let
   };
 
   setPath = self: super: {
-    #path = trace "PATH IS ${typeOf self.built}" self.built;
-    #path = toPath self.built;
     path = if isString self.built then toPath self.built else self.built;
   };
 
