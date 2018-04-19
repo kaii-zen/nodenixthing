@@ -9,12 +9,15 @@ with (callPackage ./context/dep-map.nix {});
 let
   context = contextJson;
 
-  genMeta = { contributors ? [], description ? "", ...}@packageJson:
+  genMeta = packageJson@{ contributors ? [] , description ? "" , homepage ? "", ...}:
   assert isList contributors; {
-    meta = {
+    meta = (optionalAttrs (packageJson ? contributors) {
       maintainers = contributors;
+    }) // (optionalAttrs (packageJson ? description) {
       inherit description;
-    };
+    }) // (optionalAttrs (packageJson ? homepage) {
+      inherit homepage;
+    });
   };
 
 
