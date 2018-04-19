@@ -67,8 +67,6 @@ let
       installPhase = ''
         cp ${drvName}-${super.packageJson.version}.tgz $out
       '';
-
-      inherit (genMeta super.packageJson) meta;
     };
 
     extracted = let
@@ -113,6 +111,8 @@ let
         '') self.bin)}
         cp $nixJsonPath $nixJson
       '';
+
+      inherit (genMeta super.packageJson) meta;
     };
   in optionalAttrs (super ? self) {
     inherit extracted;
@@ -141,6 +141,7 @@ let
         rm node_modules
         find -regextype posix-extended -regex '.*\.(o|mk)' -delete
       '';
+      inherit (genMeta super.packageJson) meta;
     } else self.extracted;
   };
 
