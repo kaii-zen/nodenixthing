@@ -18,7 +18,9 @@ rec {
   let
     separator = "###";
   in ''
-    cat << 'EOF' | ${parallel}/bin/parallel -j $(nproc) -N1 --pipe --recend '${separator}' bash
+    set -eo pipefail
+    cat << 'EOF' | ${parallel}/bin/parallel -j $(nproc) -N1 --halt now,fail=1 --pipe --recend '${separator}' bash
+    set -eo pipefail
     ${concatStringsSep "\n${separator}\n" scriptlets}
     EOF
   '';

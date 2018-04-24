@@ -78,16 +78,16 @@ let
     dependencyPath = "$outPath/${allModulesDir}/${name}/${version}";
     printDependency = { peerDependencies ? {}, ... }: let
       peerNames = attrNames peerDependencies;
-      peerCount = length (peerNames);
+      peerCount = length peerNames;
       hasPeers = peerCount > 0;
       announcePeers = optionalString hasPeers printPeerInfo;
-      requirers = filterPackages (_: _: { requires ? {}, ...}: requires ? ${name} && requires.${name} == version) dependencies;
+      requirers = filterPackages (_: _: { requires ? {}, ...}@a: requires ? ${name} && requires.${name} == version) dependencies;
       requirersList = mapPackagesToList (requirerName: requirerVersion: { self ? false, requires, ... }: let
-        peerResolution = genAttrs peerNames (n: requires.${n});
+        peerResolution = genAttrs (intersectLists peerNames (attrNames requires)) (n: requires.${n});
         resolutionString = concatStringsSep "+" (mapAttrsToList (n: v: "${n}@${v}") peerResolution);
         resolutionPath = "${dependencyPath}/${resolutionString}";
         requirerNodeModulesPath = "$outPath/${allModulesDir}/${requirerName}/${requirerVersion}/node_modules";
-      in optionalString (hasAttrs peerNames requires) ''
+      in optionalString (peerResolution != {}) ''
         cd ${requirerNodeModulesPath}
         if ! [[ -d ${resolutionPath} ]]; then
           mkdir -p ${resolutionPath}
@@ -118,6 +118,7 @@ let
   '';
 
 in runCommand "node-${drvName}-${drvVersion}-modules" {} (''
+  set -eo pipefail
   export outPath="$out/lib"
   mkdir -p $outPath
 '' + copyAllDeps + copyBundled + linkAllDeps + linkOwnDeps + linkAllBins + linkOwnBins + handlePeers)
