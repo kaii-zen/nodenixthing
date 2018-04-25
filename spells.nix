@@ -139,6 +139,10 @@ let
         ln -s ${nodeModules}/lib/node_modules node_modules
         export PYTHON=${python}/bin/python
         export HOME=$TMPDIR
+        export INCLUDE_PATH=${nodejs-8_x}/include/node
+        export C_INCLUDE_PATH=$INCLUDE_PATH
+        export CPLUS_INCLUDE_PATH=$INCLUDE_PATH
+        export npm_config_nodedir=$INCLUDE_PATH
         npm run install
         rm node_modules
         find -regextype posix-extended -regex '.*\.(o|mk)' -delete
