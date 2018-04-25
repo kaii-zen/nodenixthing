@@ -121,4 +121,6 @@ in runCommand "node-${drvName}-${drvVersion}-modules" {} (''
   set -eo pipefail
   export outPath="$out/lib"
   mkdir -p $outPath
-'' + copyAllDeps + copyBundled + linkAllDeps + linkOwnDeps + linkAllBins + linkOwnBins + handlePeers)
+'' + copyAllDeps + copyBundled + linkAllDeps + linkOwnDeps + linkAllBins + linkOwnBins + handlePeers + ''
+  fixupPhase
+'')
