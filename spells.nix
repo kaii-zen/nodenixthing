@@ -1,4 +1,4 @@
-{ pkgs, makeWrapper, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x }:
+{ pkgs, makeWrapper, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x, gcc }:
 { contextJson, env, npmPkgOpts, src }:
 
 with lib;
@@ -7,7 +7,7 @@ with (callPackage ./util.nix {});
 with (callPackage ./scriptlets.nix {});
 with (callPackage ./context/dep-map.nix {});
 let
-  context = contextJson;
+  context = importJSON contextJson;
 
   genMeta = packageJson@{ contributors ? [] , description ? "" , homepage ? "", ...}:
   assert isList contributors; {
@@ -19,7 +19,6 @@ let
       inherit homepage;
     });
   };
-
 
   installNodeModules = self: super: let
     inherit (super) name version shouldCompile shouldPrepare;
@@ -74,11 +73,11 @@ let
     extracted = let
       dependenciesNoDev = removeDev augmentedContext;
       selfAndNoDev = mapPackages (_: _: attrs:
-      if attrs ? self
-      then { inherit (attrs) requires; }
-      else { inherit (attrs) path; } //
-      optionalAttrs (attrs ? packageJsonOverride) { inherit (attrs) packageJsonOverride; } //
-      optionalAttrs (attrs ? requires) { inherit (attrs) requires; }) dependenciesNoDev;
+        if attrs ? self
+        then { inherit (attrs) requires; }
+        else { inherit (attrs) path; } //
+          optionalAttrs (attrs ? packageJsonOverride) { inherit (attrs) packageJsonOverride; } //
+          optionalAttrs (attrs ? requires) { inherit (attrs) requires; }) dependenciesNoDev;
 
       makeWrapperOpts = let
         env' = concatStringsSep " " (mapAttrsToList (name: value: ''--set ${name} "${value}"'') env);
@@ -129,13 +128,15 @@ let
       src = self.extracted;
       name = "${self.extracted.name}-${builtins.currentSystem}";
       propagatedBuildInputs = supplementalPropagatedBuildInputs;
-      buildInputs = [ nodejs-8_x python ] ++ supplementalBuildInputs;
+      buildInputs = [ nodejs-8_x python gcc ] ++ supplementalBuildInputs;
       phases = [ "installPhase" "fixupPhase" ];
       installPhase = ''
-        ${copyDirectory "$src" "$out"}
-        outPath="$out/lib/node_modules/${name}"
-        cd $outPath
-        rm -rf node_modules
+        ${copyDirectory "$src" "out"}
+        outPath="out/lib/node_modules/${name}"
+        pushd $outPath
+        if [[ -d node_modules ]]; then
+          mv node_modules .node_modules
+        fi
         ln -s ${nodeModules}/lib/node_modules node_modules
         export PYTHON=${python}/bin/python
         export HOME=$TMPDIR
@@ -145,7 +146,12 @@ let
         export npm_config_nodedir=$INCLUDE_PATH
         npm run install
         rm node_modules
+        if [[ -d .node_modules ]]; then
+          mv .node_modules node_modules
+        fi
         find -regextype posix-extended -regex '.*\.(o|mk)' -delete
+        popd
+        ${copyDirectory "out" "$out"}
       '';
       inherit (genMeta super.packageJson) meta;
     } else self.extracted;
