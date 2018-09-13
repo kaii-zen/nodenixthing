@@ -126,7 +126,7 @@ let
   in {
     built = if shouldCompile then stdenv.mkDerivation {
       src = self.extracted;
-      name = "${self.extracted.name}-${builtins.currentSystem}";
+      name = "${self.extracted.name}-${pkgs.system}";
       propagatedBuildInputs = supplementalPropagatedBuildInputs;
       buildInputs = [ nodejs-8_x python gcc ] ++ supplementalBuildInputs;
       phases = [ "installPhase" "fixupPhase" ];
