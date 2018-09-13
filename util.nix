@@ -4,6 +4,7 @@ with builtins;
 with pkgs;
 with pkgs.lib;
 rec {
+  countAttrs = attrs: length (attrNames attrs);
   not = notxy;
   notxy = f: x: y: !(f x y);
   notxyz = f: x: y: z: !(f x y z);
