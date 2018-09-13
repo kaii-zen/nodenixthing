@@ -33,11 +33,13 @@ let
   mkContext = callPackage ./context {};
   doMagic = callPackage ./magic.nix { inherit npmFetch; };
   doWitchcraft = callPackage ./witchcraft.nix {};
+  doKabala = callPackage ./kabala.nix {};
   castSpells = callPackage ./spells.nix {};
   makeUnicorn = callPackage ./unicorns.nix {};
 
   contextJson = mkContext { inherit package lock supplemental; };
   fetchedContextJson = doMagic { inherit contextJson; };
-  processedContextJson = doWitchcraft { contextJson = fetchedContextJson; src = srcPath; };
-  builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts; src = srcPath; };
+  extractedContextJson = doWitchcraft { contextJson = fetchedContextJson; src = srcPath; };
+  processedContextJson = doKabala { contextJson = extractedContextJson; inherit src; };
+  builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts src; };
 in builtContext.${name}.${version}.path
