@@ -31,7 +31,6 @@ let
   let
     dependenciesFor' = { requires ? {}, ... }: acc:
     let
-      origName = name;
       requires' = mapAttrs (name: version: { "${version}" = {}; }) requires;
       unseenRequires = filterPackages (name: version: _: ! (hasAttrByPath [ name version ] acc)) requires';
       expandedRequires = foldr dependenciesFor' (recursiveUpdate acc unseenRequires) (mapPackagesToList (name: version: _: depMap.${name}.${version}) unseenRequires);
