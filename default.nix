@@ -5,7 +5,7 @@
 , npmPkgOpts ? {}
 , env ? {}
 , srcPath
-, srcFilter ? path: type: type != "symlink" && ! builtins.elem (baseNameOf path) [ ".git" "node_modules" ]
+, srcFilter ? _: _: true
 }:
 
 with builtins;
@@ -16,7 +16,7 @@ let
   src = {
     outPath = builtins.path {
       path = srcPath;
-      filter = srcFilter;
+      filter = path: type: type != "symlink" && ! builtins.elem (baseNameOf path) [ ".git" "node_modules" ] && srcFilter path type;
     };
 
     packageJson = srcPath + "/package.json";
