@@ -50,6 +50,8 @@ let
 
   mapPackagesToList = f: depMap: flatten (attrValues (mapAttrs (name: versions: attrValues (mapAttrs (version: attrs: (f name version attrs)) versions)) depMap));
 
+  countPackages = depMap: length (mapPackagesToList (_: _: _: null) depMap);
+
   filterPackagesWithoutAttr = attr: let
     hasThatAttr = hasAttr attr;
     hasntThatAttr = notx hasThatAttr;
@@ -71,5 +73,5 @@ let
     plucked = mapAttrs (_: versions: mapAttrs (_: attrs: filterAttrs (n: _: n == "integrity") attrs) versions) filtered;
   in plucked;
 in {
-  inherit mkDepMap removeSelf removeDev removeNonDev removeAllButSelf needIntegrity filterPackages mapPackagesToList mapPackages dependenciesFor getDependencies extendPackages;
+  inherit countPackages mkDepMap removeSelf removeDev removeNonDev removeAllButSelf needIntegrity filterPackages mapPackagesToList mapPackages dependenciesFor getDependencies extendPackages;
 }
