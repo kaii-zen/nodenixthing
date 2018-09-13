@@ -40,7 +40,15 @@ const makeNixResolverFor = requirer => requiredPath => {
         if (depMap[requirerName][ownVersion]) {
           return ownVersion;
         }
-        return findRequirerVersion(findParent(parent));
+
+
+        const nextParent = findParent(parent);
+
+        if (nextParent) {
+          return findRequirerVersion(findParent(nextParent));
+        }
+
+        return null
       }
     }
     return findRequirerVersion(findParent(requirer));
