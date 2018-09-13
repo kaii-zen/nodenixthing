@@ -22,7 +22,6 @@ const makeNixResolverFor = requirer => requiredPath => {
       }
       return findParent(requirer.parent);
     } catch (e) {
-      // console.log('findParent', e);
       return null;
     }
   }
@@ -38,7 +37,6 @@ const makeNixResolverFor = requirer => requiredPath => {
         }
         throw 'SHADE';
       } catch (e) {
-        // console.log(e);
         if (depMap[requirerName][ownVersion]) {
           return ownVersion;
         }
@@ -74,10 +72,6 @@ const makeNixResolverFor = requirer => requiredPath => {
   const requiredVersionOf = mkVersionFinderFor(requirer);
   const getNixPathFor = moduleName => depMap[moduleName] && depMap[moduleName][requiredVersionOf(moduleName)].path;
   const moduleName = moduleHead(requiredPath);
-  // if (moduleName === "cookies") {
-  //   console.log(depMap[moduleName]);
-  //   console.log(requiredVersionOf(moduleName));
-  // }
   const nixPath = getNixPathFor(moduleName)
   return pathJoin(nixPath, 'lib', 'node_modules');
 }
@@ -87,12 +81,8 @@ Module.prototype.require = function(request) {
   const resolveOpts = {};
   try {
     resolveOpts.paths = [nixResolve(request)];
-    // console.log(resolveOpts);
     arguments[0] = require.resolve(request, resolveOpts);
   } catch (e) {
-    // if (request === "react") {
-    //   console.log(e);
-    // }
   } finally {
     return originalRequire.call(this, arguments[0]);
   }
