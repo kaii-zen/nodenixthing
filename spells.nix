@@ -131,9 +131,9 @@ let
       buildInputs = [ nodejs-8_x python gcc ] ++ supplementalBuildInputs;
       phases = [ "installPhase" "fixupPhase" ];
       installPhase = ''
-        ${copyDirectory "$src" "out"}
-        outPath="out/lib/node_modules/${name}"
-        pushd $outPath
+        ${copyDirectory "$src" "$out"}
+        outPath="$out/lib/node_modules/${name}"
+        cd $outPath
         if [[ -d node_modules ]]; then
           mv node_modules .node_modules
         fi
@@ -150,8 +150,6 @@ let
           mv .node_modules node_modules
         fi
         find -regextype posix-extended -regex '.*\.(o|mk)' -delete
-        popd
-        ${copyDirectory "out" "$out"}
       '';
       inherit (genMeta super.packageJson) meta;
     } else self.extracted;
