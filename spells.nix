@@ -123,12 +123,14 @@ let
     inherit (self) name drvName drvVersion shouldCompile nodeModules;
     supplementalBuildInputs = optionals (self ? buildInputs) (map (n: pkgs.${n}) self.buildInputs);
     supplementalPropagatedBuildInputs = optionals (self ? propagatedBuildInputs) (map (n: pkgs.${n}) self.propagatedBuildInputs);
+    supplementalPatches = optionals (self ? patches) self.patches;
   in {
     built = if shouldCompile then stdenv.mkDerivation {
       src = self.extracted;
       name = "${self.extracted.name}-${pkgs.system}";
       propagatedBuildInputs = supplementalPropagatedBuildInputs;
       buildInputs = [ nodejs-8_x python gcc ] ++ supplementalBuildInputs;
+      patches = supplementalPatches;
       phases = [ "installPhase" "fixupPhase" ];
       installPhase = ''
         ${copyDirectory "$src" "$out"}
@@ -144,6 +146,9 @@ let
         export C_INCLUDE_PATH=$INCLUDE_PATH
         export CPLUS_INCLUDE_PATH=$INCLUDE_PATH
         export npm_config_nodedir=$INCLUDE_PATH
+        for i in ''${patches:-}; do
+          cat $i | patch -p1
+        done
         npm run install
         rm node_modules
         if [[ -d .node_modules ]]; then
