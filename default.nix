@@ -4,8 +4,7 @@
 , npmRc ? ""
 , npmPkgOpts ? {}
 , env ? {}
-, srcPath
-, srcFilter ? _: _: true
+, src
 }:
 
 with builtins;
@@ -13,18 +12,8 @@ with pkgs;
 with pkgs.lib;
 with (callPackage ./util.nix {});
 let
-  src = {
-    outPath = builtins.path {
-      path = srcPath;
-      filter = path: type: type != "symlink" && ! builtins.elem (baseNameOf path) [ ".git" "node_modules" ] && srcFilter path type;
-    };
-
-    packageJson = srcPath + "/package.json";
-    npmShrinkwrap = srcPath + "/npm-shrinkwrap.json";
-  };
-
-  package = importJSON src.packageJson;
-  lock    = importJSON src.npmShrinkwrap;
+  package = importJSON "${src}/package.json";
+  lock    = importJSON "${src}/npm-shrinkwrap.json";
 
   inherit (package) name version;
 
@@ -39,7 +28,7 @@ let
 
   contextJson = mkContext { inherit package lock supplemental; };
   fetchedContextJson = doMagic { inherit contextJson; };
-  extractedContextJson = doWitchcraft { contextJson = fetchedContextJson; src = srcPath; };
+  extractedContextJson = doWitchcraft { contextJson = fetchedContextJson; inherit src; };
   processedContextJson = doKabala { contextJson = extractedContextJson; inherit src; };
   builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts src; };
 in builtContext.${name}.${version}.path
