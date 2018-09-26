@@ -124,12 +124,13 @@ let
     supplementalBuildInputs = optionals (self ? buildInputs) (map (n: pkgs.${n}) self.buildInputs);
     supplementalPropagatedBuildInputs = optionals (self ? propagatedBuildInputs) (map (n: pkgs.${n}) self.propagatedBuildInputs);
     supplementalPatches = optionals (self ? patches) self.patches;
+    darwinBuildInputs = with pkgs.darwin; optionals stdenv.isDarwin [ cctools dtrace apple_sdk.frameworks.CoreServices ];
   in {
     built = if shouldCompile then stdenv.mkDerivation {
       src = self.extracted;
       name = "${self.extracted.name}-${pkgs.system}";
       propagatedBuildInputs = supplementalPropagatedBuildInputs;
-      buildInputs = [ nodejs-8_x python gcc ] ++ supplementalBuildInputs;
+      buildInputs = [ nodejs-8_x python ] ++ darwinBuildInputs ++ supplementalBuildInputs;
       patches = supplementalPatches;
       phases = [ "installPhase" "fixupPhase" ];
       installPhase = ''
@@ -149,7 +150,7 @@ let
         for i in ''${patches:-}; do
           cat $i | patch -p1
         done
-        npm run install
+        npm run install --build-from-source
         rm node_modules
         if [[ -d .node_modules ]]; then
           mv .node_modules node_modules
