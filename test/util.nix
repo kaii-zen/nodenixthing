@@ -9,6 +9,38 @@ rec {
   callPackage = pkgs.callPackage;
   json = toJSON tests;
   tests = runTests {
+    testResolveRequires = let
+      resolveRequires = callPackage ../context/resolve-requires.nix {};
+    in {
+      expr = resolveRequires {
+        requires = {
+          moduleA = "some version constraint that we should ignore";
+        };
+        dependencies = {
+          moduleA.version = "1.2.4";
+
+          moduleB = {
+            version = "4.3.2";
+            requires.moduleA = "another version constraint we should ignore";
+          };
+        };
+      };
+
+      expected = {
+        requires = {
+          moduleA = "1.2.4";
+        };
+
+        dependencies = {
+          moduleA.version = "1.2.4";
+          moduleB = {
+            version = "4.3.2";
+            requires.moduleA = "1.2.4";
+          };
+        };
+      };
+    };
+
     testCopyNodeModules = let
       depMap = {
         packageA."1.0.0" = {
@@ -195,6 +227,7 @@ rec {
 
       expected = {
         awesome = {
+          name = "awesome";
           version = "1.0.0";
           description = "blah blah blah";
         };
@@ -212,6 +245,7 @@ rec {
         package = {
           "1.0.0" = {
             description = "blah blah blah";
+            version = "1.0.0";
           };
         };
       };

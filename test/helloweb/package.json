@@ -12,10 +12,7 @@
     "prepare": "browserify -t cssify public/script.js -o public/bundle.js"
   },
   "dependencies": {
-    "bcrypt": "^1.0.3",
-    "canvas": "^1.6.4",
-    "express": "^4.16.2",
-    "grpc": "^1.9.1"
+    "express": "^4.16.2"
   },
   "devDependencies": {
     "browserify": "^16.1.0",

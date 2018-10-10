@@ -18,6 +18,10 @@ let
     };
   };
 
+  resolveRequires = self: super: {
+    normalizedInput.${super.lock.name} = (callPackage ./resolve-requires.nix {}) super.normalizedInput.${super.lock.name};
+  };
+
   flattenDependencies = let
     # 1) Filter out bundled dependencies. We don't care about those since they're already included in the npm package and we don't need to do anything about them.
     #    Moreover, if we leave them they cause infinite recursion.
@@ -97,4 +101,4 @@ let
     };
   in composeMultipleExtensions [addName resolveGit collectMissingIntegrity];
 
-in composeMultipleExtensions [normalizeInput flattenDependencies misc]
+in composeMultipleExtensions [normalizeInput resolveRequires flattenDependencies misc]

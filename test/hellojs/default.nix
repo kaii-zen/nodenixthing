@@ -1,5 +1,5 @@
 import ../../default.nix {
-  srcPath = ./.;
+  src = ./.;
   npmPkgOpts = {
     "hello:meow" = "woof";
   };

@@ -3,7 +3,7 @@
 , system ? builtins.currentSystem }:
 
 pkgs.stdenv.mkDerivation {
-  name = "hello-tests";
+  name = "tests";
   buildInputs = [ pkgs.nix pkgs.jq ];
   src = ../.;
   NIX_PATH="nixpkgs=${pkgs.path}";
@@ -22,6 +22,6 @@ pkgs.stdenv.mkDerivation {
     export PAGER=cat
     cacheDir=$TEST_ROOT/binary-cache
     nix-store --init
-    nix-instantiate --eval --strict $src/test/util.nix -A json | jq --color-output 'fromjson' | tee $out
+    nix-instantiate --eval --strict --show-trace $src/test/util.nix -A json | jq --color-output 'fromjson' | tee $out
   '';
 }
