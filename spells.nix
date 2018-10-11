@@ -42,7 +42,7 @@ let
     inherit (self) name version drvName drvVersion nodeModules;
     workDir = "~/src";
     supplementalBuildInputs = optionals (super ? buildInputs) super.buildInputs;
-    npmPackage = stdenv.mkDerivation {
+    npmPackage = stdenv.mkDerivation (env // {
       inherit src;
       dontStrip = true;
       name = "node-${drvName}-${drvVersion}.tgz";
@@ -59,16 +59,16 @@ let
           ${concatStrings (mapAttrsToList (name: value: ''
             npm set ${name} "${value}"
           '') npmPkgOpts)}
-      '';
+          '';
 
-      buildPhase = ''
-        npm pack
-      '';
+          buildPhase = ''
+            npm pack
+          '';
 
-      installPhase = ''
-        cp ${drvName}-${super.packageJson.version}.tgz $out
-      '';
-    };
+          installPhase = ''
+            cp ${drvName}-${super.packageJson.version}.tgz $out
+          '';
+        });
 
     extracted = let
       dependenciesNoDev = removeDev augmentedContext;
