@@ -132,6 +132,8 @@ let
           cp -a ${path}/node_modules ${path}/${peerResolutionString}/node_modules
           ${concatStrings (mapAttrsToList (n: v: (indent ''
           rm -f ${path}/${peerResolutionString}/node_modules/${n}
+          mkdir -p ${path}/${peerResolutionString}/node_modules/${n}
+          rmdir ${path}/${peerResolutionString}/node_modules/${n}
           ln -s $outPath/${allModulesDir}/${n}/${v}/node_modules/${n} ${path}/${peerResolutionString}/node_modules/${n}
           '')) peerResolution)}
         fi
