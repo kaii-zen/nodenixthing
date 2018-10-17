@@ -3,6 +3,7 @@
 , idRsa ? ""
 , npmRc ? ""
 , npmPkgOpts ? {}
+, preBuild ? ""
 , env ? {}
 , src
 }:
@@ -30,5 +31,5 @@ let
   fetchedContextJson = doMagic { inherit contextJson; };
   extractedContextJson = doWitchcraft { contextJson = fetchedContextJson; inherit src; };
   processedContextJson = doKabala { contextJson = extractedContextJson; inherit src; };
-  builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts src; };
+  builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts src preBuild; };
 in builtContext.${name}.${version}.path

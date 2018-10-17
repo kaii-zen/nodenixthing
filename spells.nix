@@ -1,5 +1,5 @@
 { pkgs, makeWrapper, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x, gcc }:
-{ contextJson, env, npmPkgOpts, src }:
+{ contextJson, env, npmPkgOpts, src, preBuild }:
 
 with lib;
 with builtins;
@@ -56,19 +56,20 @@ let
 
       configurePhase = ''
         ln -s ${nodeModules}/lib/node_modules node_modules
-          ${concatStrings (mapAttrsToList (name: value: ''
-            npm set ${name} "${value}"
-          '') npmPkgOpts)}
-          '';
+        ${concatStrings (mapAttrsToList (name: value: ''
+          npm set ${name} "${value}"
+        '') npmPkgOpts)}
+      '';
 
-          buildPhase = ''
-            npm pack
-          '';
+      buildPhase = ''
+        ${preBuild}
+        npm pack
+      '';
 
-          installPhase = ''
-            cp ${drvName}-${super.packageJson.version}.tgz $out
-          '';
-        });
+      installPhase = ''
+        cp ${drvName}-${super.packageJson.version}.tgz $out
+      '';
+    });
 
     extracted = let
       dependenciesNoDev = removeDev augmentedContext;
