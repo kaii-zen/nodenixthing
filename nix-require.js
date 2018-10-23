@@ -91,6 +91,9 @@ Module.prototype.require = function(request) {
     resolveOpts.paths = [nixResolve(request)];
     arguments[0] = require.resolve(request, resolveOpts);
   } catch (e) {
+    if (process.env.NODE_NIX_REQUIRE_VERBOSE) {
+      console.log(e)
+    }
   } finally {
     return originalRequire.call(this, arguments[0]);
   }
