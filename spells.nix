@@ -42,6 +42,7 @@ let
     inherit (self) name version drvName drvVersion nodeModules;
     workDir = "~/src";
     supplementalBuildInputs = optionals (super ? buildInputs) super.buildInputs;
+
     npmPackage = stdenv.mkDerivation (env // {
       inherit src;
       dontStrip = true;
@@ -117,7 +118,7 @@ let
       inherit (genMeta super.packageJson) meta;
     };
   in optionalAttrs (super ? self) {
-    inherit extracted;
+    inherit extracted npmPackage;
   };
 
   buildNative = self: super: let

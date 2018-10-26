@@ -32,4 +32,7 @@ let
   extractedContextJson = doWitchcraft { contextJson = fetchedContextJson; inherit src; };
   processedContextJson = doKabala { contextJson = extractedContextJson; inherit src; };
   builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts src preBuild; };
-in builtContext.${name}.${version}.path
+in {
+  nix = builtContext.${name}.${version}.path;
+  npm = builtContext.${name}.${version}.npmPackage;
+}
