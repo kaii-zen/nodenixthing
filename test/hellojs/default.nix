@@ -2,7 +2,7 @@
 
 import ../.. {
   inherit pkgs;
-  src = ./.;
+  src = pkgs.lib.cleanSource ./.;
 
   npmPkgOpts = {
     "hello:meow" = "woof";

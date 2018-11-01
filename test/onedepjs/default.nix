@@ -15,6 +15,6 @@ let
 
 in import ../../default.nix {
   inherit pkgs;
-  src = ./.;
+  src = pkgs.lib.cleanSource ./.;
   inherit idRsa npmRc;
 }

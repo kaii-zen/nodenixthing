@@ -1,5 +1,5 @@
 { pkgs ? import <nixpkgs> {} }:
 
 import ../.. {
-  src = ./.;
+  src = pkgs.lib.cleanSource ./.;
 }
