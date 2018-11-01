@@ -26,7 +26,6 @@ let
   doWitchcraft = callPackage ./witchcraft.nix {};
   doKabala = callPackage ./kabala.nix {};
   castSpells = callPackage ./spells.nix {};
-  makeUnicorn = callPackage ./unicorns.nix {};
 
   context = mkContext { inherit package lock supplemental; };
   fetchedContextJson = doMagic { inherit context; };
