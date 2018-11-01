@@ -1,4 +1,4 @@
-import ../../default.nix {
+import ../.. {
   src = ./.;
   npmPkgOpts = {
     "hello:meow" = "woof";
