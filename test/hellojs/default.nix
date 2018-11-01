@@ -3,7 +3,12 @@
 import ../.. {
   inherit pkgs;
   src = ./.;
+
   npmPkgOpts = {
     "hello:meow" = "woof";
   };
+
+  check = ''
+    hello
+  '';
 }

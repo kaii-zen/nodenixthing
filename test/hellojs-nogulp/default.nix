@@ -9,4 +9,8 @@ import ../.. {
   npmPkgOpts = {
     "hello:meow" = "rawr";
   };
+
+  check = ''
+    hello
+  '';
 }

@@ -1,5 +1,5 @@
 { pkgs, makeWrapper, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x, gcc }:
-{ contextJson, env, npmPkgOpts, src, preBuild }:
+{ contextJson, check, env, npmPkgOpts, src, preBuild }:
 
 with lib;
 with builtins;
@@ -92,7 +92,7 @@ let
       nativeBuildInputs = [ makeWrapper ];
       nixJson = toJSON selfAndNoDev;
       passAsFile = [ "nixJson" ];
-      phases = [ "installPhase" "fixupPhase" ];
+      phases = [ "installPhase" "fixupPhase" "checkPhase" ];
       installPhase = ''
         set -eo pipefail
 
@@ -113,6 +113,12 @@ let
           makeWrapper $target $out/bin/${bin} ${makeWrapperOpts}
         '') self.bin)}
         cp $nixJsonPath $nixJson
+      '';
+
+      doCheck = true;
+      checkPhase = ''
+        PATH=$out/bin:$PATH
+        ${check}
       '';
 
       inherit (genMeta super.packageJson) meta;
