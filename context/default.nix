@@ -1,5 +1,4 @@
 { callPackage, writeText, lib }:
-#{ package, lock, supplemental ? {}, src ? "" }:
 { package, lock, supplemental ? {}}:
 
 with builtins;
@@ -10,7 +9,6 @@ assert isAttrs supplemental;
 with lib;
 let
   input = makeExtensible (_: {
-    #inherit package lock supplemental src;
     inherit package lock supplemental;
   });
   transforms = callPackage ./transformations.nix {};
