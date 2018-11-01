@@ -1,3 +1,5 @@
-import ../../default.nix {
+{ pkgs ? import <nixpkgs> {} }:
+
+import ../.. {
   src = ./.;
 }

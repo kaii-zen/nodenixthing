@@ -1,3 +1,5 @@
+{ pkgs ? import <nixpkgs> {} }:
+
 import ../.. {
   src = builtins.path {
     path = ./.;
