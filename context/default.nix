@@ -14,5 +14,4 @@ let
   transforms = callPackage ./transformations.nix {};
   inputTransformed = input.extend transforms;
   context = inputTransformed.dependencies;
-
-in writeText "context.json" (toJSON context)
+in context

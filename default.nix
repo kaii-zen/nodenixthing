@@ -28,8 +28,8 @@ let
   castSpells = callPackage ./spells.nix {};
   makeUnicorn = callPackage ./unicorns.nix {};
 
-  contextJson = mkContext { inherit package lock supplemental; };
-  fetchedContextJson = doMagic { inherit contextJson; };
+  context = mkContext { inherit package lock supplemental; };
+  fetchedContextJson = doMagic { inherit context; };
   extractedContextJson = doWitchcraft { contextJson = fetchedContextJson; inherit src; };
   processedContextJson = doKabala { contextJson = extractedContextJson; inherit src; };
   builtContext = castSpells { contextJson = processedContextJson; inherit env npmPkgOpts src preBuild check; };
