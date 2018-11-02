@@ -68,7 +68,10 @@ let
       '';
 
       installPhase = ''
-        cp ${drvName}-${super.packageJson.version}.tgz $out
+        mkdir -p $out/tarballs
+        mv ${drvName}-${super.packageJson.version}.tgz $out/tarballs
+        mkdir -p $out/nix-support
+        echo "file source-dist $out/tarballs/$tgzFile" >> $out/nix-support/hydra-build-products
       '';
     });
 
@@ -105,7 +108,7 @@ let
 
         #cat $nodeModulesPath | xargs -n1 > $out/nix-support/srcs
 
-        tar xf $src --warning=no-unknown-keyword --directory $libPath --strip-components=1
+        tar xf $src/tarballs/*.tgz --warning=no-unknown-keyword --directory $libPath --strip-components=1
         ${concatStrings (mapAttrsToList (bin: target: ''
           mkdir -p $binPath
           target=$(realpath $libPath/${target})
