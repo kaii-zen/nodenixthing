@@ -1,4 +1,4 @@
-{ lib, writeText, callPackage, runCommand, nodejs-8_x, npmFetch }:
+{ lib, writeText, callPackage, runCommand, nodejs, npmFetch }:
 { context }:
 
 with lib;

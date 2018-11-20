@@ -1,7 +1,7 @@
 let
   pkgs = import <nixpkgs> {
     overlays = [(self: super: {
-      inherit (nur.repos.kreisys) nodejs-8_x;
+      inherit (nur.repos.kreisys) nodejs;
     })];
   };
 

@@ -1,4 +1,4 @@
-{ lib, nodejs-8_x, callPackage, stdenv, parallel }:
+{ lib, nodejs, callPackage, stdenv, parallel }:
 { src, depMap }:
 
 with lib;
@@ -20,7 +20,7 @@ in stdenv.mkDerivation {
   pname = name;
   name = "node-${name}-${version}.tgz";
   nativeBuildInputs = [ parallel ];
-  buildInputs = [ nodejs-8_x ];
+  buildInputs = [ nodejs ];
   prePhases = [ "setHomePhase" ];
   setHomePhase = "export HOME=$TMPDIR";
   unpackPhase = ''

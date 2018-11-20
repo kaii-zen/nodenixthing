@@ -1,4 +1,4 @@
-{ pkgs, makeWrapper, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x, gcc }:
+{ pkgs, makeWrapper, writeText, lib, callPackage, stdenv, runCommand, python, nodejs, gcc }:
 { contextJson, check, env, npmPkgOpts, src, preBuild }:
 
 with lib;
@@ -47,7 +47,7 @@ let
       inherit src;
       dontStrip = true;
       name = "node-${drvName}-${drvVersion}.tgz";
-      buildInputs = [ nodejs-8_x ] ++ supplementalBuildInputs;
+      buildInputs = [ nodejs ] ++ supplementalBuildInputs;
       prePhases = [ "setHomePhase" ];
       setHomePhase = "export HOME=$TMPDIR";
       unpackPhase = ''
@@ -90,7 +90,7 @@ let
     in stdenv.mkDerivation {
       name = "node-${drvName}-${drvVersion}";
       src = npmPackage;
-      buildInputs = [ nodejs-8_x ];
+      buildInputs = [ nodejs ];
 
       nativeBuildInputs = [ makeWrapper ];
       nixJson = toJSON selfAndNoDev;
@@ -141,7 +141,7 @@ let
       src = self.extracted;
       name = "${self.extracted.name}-${pkgs.system}";
       propagatedBuildInputs = supplementalPropagatedBuildInputs;
-      buildInputs = [ nodejs-8_x python ] ++ darwinBuildInputs ++ supplementalBuildInputs;
+      buildInputs = [ nodejs python ] ++ darwinBuildInputs ++ supplementalBuildInputs;
       patches = supplementalPatches;
       phases = [ "installPhase" "fixupPhase" ];
       installPhase = ''
@@ -154,7 +154,7 @@ let
         ln -s ${nodeModules}/lib/node_modules node_modules
         export PYTHON=${python}/bin/python
         export HOME=$TMPDIR
-        export INCLUDE_PATH=${nodejs-8_x}/include/node
+        export INCLUDE_PATH=${nodejs}/include/node
         export C_INCLUDE_PATH=$INCLUDE_PATH
         export CPLUS_INCLUDE_PATH=$INCLUDE_PATH
         export npm_config_nodedir=$INCLUDE_PATH

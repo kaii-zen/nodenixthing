@@ -1,4 +1,4 @@
-{ lib, curl, perl, writeText, stdenvNoCC, nodejs-8_x, git, openssh, cacert
+{ lib, curl, perl, writeText, stdenvNoCC, nodejs, git, openssh, cacert
 , idRsa ? ""
 , npmRc ? ""
 }:
@@ -63,7 +63,7 @@ in stdenvNoCC.mkDerivation {
     cp $tgzFile $out
   '';
 
-  nativeBuildInputs = [ nodejs-8_x git openssh curl ];
+  nativeBuildInputs = [ nodejs git openssh curl ];
 
   # New-style output content requirements.
   inherit outputHashAlgo outputHash;

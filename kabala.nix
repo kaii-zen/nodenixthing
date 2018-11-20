@@ -1,4 +1,4 @@
-{ pkgs, writeText, lib, callPackage, stdenv, runCommand, python, nodejs-8_x }:
+{ pkgs, writeText, lib, callPackage, stdenv, runCommand, python, nodejs }:
 { contextJson, src }:
 
 with lib;

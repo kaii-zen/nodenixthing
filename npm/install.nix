@@ -1,4 +1,4 @@
-{ writeText, callPackage, nodejs-8_x, lib, runCommand }:
+{ writeText, callPackage, nodejs, lib, runCommand }:
 depMap:
 { name, version, src }:
 
@@ -36,7 +36,7 @@ let
     nodeModulesPath = if self then "$projectNodeModules" else "$dependenciesDir/${name}/${version}/node_modules";
     binPath = if self then "${nodeModulesPath}/.bin" else "${nodeModulesPath}/${name}/node_modules/.bin";
   in ''
-    find -L ${nodeModulesPath}/ -mindepth 2 -maxdepth 2 -name package.json -exec ${nodejs-8_x}/bin/node ${../nix-bin.js} {} \; | \
+    find -L ${nodeModulesPath}/ -mindepth 2 -maxdepth 2 -name package.json -exec ${nodejs}/bin/node ${../nix-bin.js} {} \; | \
       xargs --max-args=3 --no-run-if-empty bash -c '[[ $1 == ${name} ]] || (mkdir -p ${binPath} ; ln -s $(readlink -f ${nodeModulesPath}/$1/$3) ${binPath}/$2)' _
   '';
 

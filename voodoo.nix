@@ -1,4 +1,4 @@
-{ lib, writeText, callPackage, runCommand, nodejs-8_x }:
+{ lib, writeText, callPackage, runCommand, nodejs }:
 { name, version, context }:
 
 with lib;
@@ -48,7 +48,7 @@ let
     nodeModulesPath = "$outPath/${allModulesDir}/${name}/${version}/node_modules";
     binPath = "${nodeModulesPath}/${name}/node_modules/.bin";
   in ''
-    find -L ${nodeModulesPath}/ -mindepth 2 -maxdepth 2 -name package.json -exec ${nodejs-8_x}/bin/node ${./nix-bin.js} {} \; | \
+    find -L ${nodeModulesPath}/ -mindepth 2 -maxdepth 2 -name package.json -exec ${nodejs}/bin/node ${./nix-bin.js} {} \; | \
       xargs --max-args=3 --no-run-if-empty bash -c '[[ $1 == ${name} ]] || (mkdir -p ${binPath} ; ln -s $(readlink -f ${nodeModulesPath}/$1/$3) ${binPath}/$2)' _
   '';
 
@@ -72,7 +72,7 @@ let
     nodeModulesPath = "$(realpath $outPath/${allModulesDir}/..)";
     binPath = "${nodeModulesPath}/.bin";
   in ''
-    find -L ${nodeModulesPath}/ -mindepth 2 -maxdepth 2 -name package.json -exec ${nodejs-8_x}/bin/node ${./nix-bin.js} {} \; | \
+    find -L ${nodeModulesPath}/ -mindepth 2 -maxdepth 2 -name package.json -exec ${nodejs}/bin/node ${./nix-bin.js} {} \; | \
       xargs --max-args=3 --no-run-if-empty bash -c '(mkdir -p ${binPath} ; ln -s $(readlink -f ${nodeModulesPath}/$1/$3) ${binPath}/$2)' _
   '';
 

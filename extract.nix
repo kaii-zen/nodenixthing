@@ -1,9 +1,9 @@
-{ runCommand, lib, nodejs-8_x }:
+{ runCommand, lib, nodejs }:
 
 self: super: let
   inherit (self) name drvName drvVersion;
 in lib.optionalAttrs (!(super ? self) && super ? npmPackage) {
-  extracted = runCommand "node-${drvName}-${drvVersion}" { inherit (super) npmPackage; buildInputs = [ nodejs-8_x ]; } ''
+  extracted = runCommand "node-${drvName}-${drvVersion}" { inherit (super) npmPackage; buildInputs = [ nodejs ]; } ''
     export outPath="$out/lib/node_modules/${name}"
     mkdir -p $outPath
     tar xf $npmPackage --warning=no-unknown-keyword --directory $outPath --strip-components=1
