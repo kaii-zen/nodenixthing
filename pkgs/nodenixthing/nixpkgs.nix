@@ -1,17 +1,16 @@
-{ system ? builtins.currentSystem }:
-
 with builtins;
 
-let
+{ system ? currentSystem }: let
   importJSON = file: fromJSON (readFile file);
 
-  nixpkgs = builtins.fetchGit {
+  nixpkgs = fetchGit {
     inherit (importJSON ./nixpkgs.json) url rev;
   };
 
-  nodenixthing = builtins.fetchGit {
+  nodenixthing = fetchGit {
     inherit (importJSON ./nodenixthing.json) url rev;
   };
+
 in import nixpkgs {
   inherit system;
   overlays = [ (_: pkgs: {
