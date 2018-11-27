@@ -13,6 +13,13 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
     grep "^use nix$" .envrc
     test -w .envrc
     test -w shell.nix
+
+    $binary nuke
+
+    for f in *.json *.nix .envrc; do
+      ! test -e $f
+    done
+
   '';
 } (c:
     [
@@ -32,6 +39,10 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
           nix-prefetch-git https://github.com/kreisys/nodenixthing > nodenixthing.json
           nix-prefetch-git https://github.com/NixOS/nixpkgs-channels > nixpkgs.json
         fi
+      '')
+
+      (c "nuke" "Remove all files created by init" ''
+        rm -f .envrc shell.nix nixpkgs.nix nodenixthing.json nixpkgs.json
       '')
     ]
   )
