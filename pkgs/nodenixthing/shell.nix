@@ -1,10 +1,10 @@
 let
-  pkgs = import <nixpkgs> {};
+  pkgs = import ./nixpkgs.nix {};
 in
 
 with pkgs;
 
 mkShell {
-  buildInputs = [ nodejs ];
+  buildInputs = [ nodejs nodenixthing ];
 }
  
