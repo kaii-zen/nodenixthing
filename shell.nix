@@ -3,5 +3,8 @@
 with pkgs;
 
 mkShell {
-  buildInputs = [ nodejs ];
+  buildInputs = [
+    nodejs
+    (callPackages ./pkgs {}).nodenixthing
+  ];
 }
