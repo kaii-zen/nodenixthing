@@ -7,17 +7,28 @@ name: description: env: commandsFn: let
 
   commands = commandsFn mkCommand;
 
+  maxCommandLength = with lib; let
+    commandLengths = map ({ command, ... }: stringLength command) commands;
+    maxLength = builtins.foldl' max 0 commandLengths;
+  in maxLength;
+
   usage = writeText "${name}-usage.txt" ''
     Usage: ${name} [--version] [--help] <command> [args]
 
+    Description:
     ${description}
+
     The available commands for execution are listed below.
 
     Commands:
-        ${lib.concatMapStrings ({ command, description, ... }: ''
-        ${command}                ${description}
-        '') commands}
-
+    ${lib.concatMapStrings ({ command, description, ... }: with lib; let
+      indentSize    = 4;
+      commandLength = stringLength command;
+      indentation   = fixedWidthString indentSize " " "";
+      spacer        = fixedWidthString (maxCommandLength + indentSize - commandLength) " " "| ";
+    in ''
+      ${indentation}${command}${spacer}${description}
+    '') commands}
   '';
 
 in stdenv.mkDerivation ({
