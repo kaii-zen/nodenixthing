@@ -1,10 +1,10 @@
-{ mkBashCli, writeText, nix-prefetch-git, rev ? null }:
+{ pkgs, mkBashCli, lib, writeText, nix-prefetch-git, nix, jq, rev ? null }:
 
 mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
   doCheck = true;
 
   checkPhase = ''
-    set -e
+    set -eo pipefail
 
     export TEST_MODE=true 
 
@@ -19,7 +19,6 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
     for f in *.json *.nix .envrc; do
       ! test -e $f
     done
-
   '';
 } (c:
     [
@@ -43,6 +42,17 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
 
       (c "nuke" "Remove all files created by init" ''
         rm -f .envrc shell.nix nixpkgs.nix nodenixthing.json nixpkgs.json
+      '')
+
+      (c "make-context" "Generate a context.json file from package.json and npm-shrinkwrap.json" ''
+        PATH=${jq}/bin:${nix}/bin:$PATH
+        if [[ $1 != --stdout ]]; then
+          exec 1>context.json
+        fi
+        nix-instantiate ${./make-context.nix} --argstr nixpkgs ${pkgs.path} --argstr nodenixthingRoot ${lib.cleanSource ../..} --strict --eval --json | jq .
+      '')
+
+
       '')
     ]
   )
