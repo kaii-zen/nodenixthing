@@ -1,7 +1,7 @@
-{ newScope }:
+{ pkgs ? import <nixpkgs> {} }: 
 
 let
-  callPackage = newScope self;
+  callPackage = pkgs.newScope self;
 
   self = rec {
     mkBashCli           = callPackage ./make-bash-cli.nix { };
