@@ -52,7 +52,26 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
         nix-instantiate ${./make-context.nix} --argstr nixpkgs ${pkgs.path} --argstr nodenixthingRoot ${lib.cleanSource ../..} --strict --eval --json | jq .
       '')
 
+      (c "fetch" "Fetch an npm package into the Nix store" ''
+        PATH=${jq}/bin:${nix}/bin:$PATH
 
+        if [[ $1 == --all ]]; then
+          $0 make-context --stdout | jq -r '.[][] | "\(.name) \(.version) \(.resolved) \(.integrity)"' | grep -v 'null$' | xargs --max-args=4 --max-procs=0 $0 fetch
+          exit $?
+        fi
+
+        name=''${1?Must specify derivation name}
+        version=''${2?Must specify version}
+        url=''${3?Must specify source URL}
+        hash=''${4?Must specify hash}
+
+        nix-build ${./fetch.nix} --no-out-link \
+          --argstr nixpkgs ${pkgs.path} \
+          --argstr nodenixthingRoot ${lib.cleanSource ../..} \
+          --argstr name      "$name"    \
+          --argstr version   "$version" \
+          --argstr resolved  "$url"     \
+          --argstr integrity "$hash"
       '')
     ]
   )
