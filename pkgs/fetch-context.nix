@@ -14,9 +14,8 @@ let
     npmPackage = npmFetch { inherit (self) name version resolved integrity npmRc; };
   };
 
-  #extract = callPackage ./extract.nix {};
+  extract = callPackage ../extract.nix {};
 
-  #augmentedContext = extendPackages context [ fetch extract ];
-  augmentedContext = extendPackages context [ fetch ];
+  augmentedContext = extendPackages context [ fetch extract ];
 
 in writeText "context.json" (toJSON augmentedContext)
