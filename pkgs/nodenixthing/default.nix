@@ -46,17 +46,48 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
 
       (c "make-context" "Generate a context.json file from package.json and npm-shrinkwrap.json" ''
         PATH=${jq}/bin:${nix}/bin:$PATH
-        if [[ $1 != --stdout ]]; then
-          exec 1>context.json
+
+        eval set -- "$(getopt -o sof:: --long store,stdout,file -- "$@")"
+
+        fileName=context.json
+        store=false
+        stdout=false
+
+        while true ; do
+          case "$1" in
+            -f|--file)   fileName=$2 ; shift 2 ;;
+            -s|--store)  store=true  ; shift   ;;
+            -o|--stdout) stdout=true ; shift   ;;
+            --) shift ; break ;;
+            *) echo "Unrecognized option $1" ; exit 1 ;;
+          esac
+        done
+
+        if $store; then
+          fileName=$(mktemp)
         fi
+
+        if ! $stdout; then
+          ${/* Save original stdout fd so that we can restore it later */ ""}
+	  exec 3>&1 1>$fileName
+        fi
+
         nix-instantiate ${./make-context.nix} --argstr nixpkgs ${pkgs.path} --argstr nodenixthingRoot ${lib.cleanSource ../..} --strict --eval --json | jq .
+
+        if $store; then
+          ${/* Restore original stdout so that we can see the store path */ ""}
+	  exec 1>&3 3>&-
+          nix add-to-store --name context.json $fileName
+          rm $fileName
+        fi
       '')
 
       (c "fetch" "Fetch an npm package into the Nix store" ''
         PATH=${jq}/bin:${nix}/bin:$PATH
 
+
         if [[ $1 == --all ]]; then
-          $0 make-context --stdout | jq -r '.[][] | "\(.name) \(.version) \(.resolved) \(.integrity)"' | grep -v 'null$' | xargs --max-args=4 --max-procs=0 $0 fetch
+          $0 make-context --stdout | jq -r '.[][] | "\(.name) \(.version) \(.resolved) \(.integrity)"' | grep -v 'null$' | xargs --max-args=4 --max-procs=8 $0 fetch
           exit $?
         fi
 
@@ -72,6 +103,21 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
           --argstr version   "$version" \
           --argstr resolved  "$url"     \
           --argstr integrity "$hash"
+      '')
+
+      (c "fetch-context" "Fetch the tarballs for all npm packages required by the build context" ''
+        PATH=${jq}/bin:${nix}/bin:$PATH
+
+        if [[ -e context.json ]]; then
+          contextJSON=context.json
+        else
+          contextJSON=$($0 make-context --store)
+        fi
+
+        nix-build ${./fetch-context.nix} --no-out-link \
+          --argstr nixpkgs ${pkgs.path} \
+          --argstr nodenixthingRoot ${lib.cleanSource ../..} \
+          --argstr contextJSON "$contextJSON"
       '')
     ]
   )

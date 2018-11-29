@@ -6,8 +6,12 @@
 
 with pkgs.lib;
 
-let context = nodenixthingPkgs.mkNpmPackageContext {
-    package = importJSON "${src}/package.json";
-    lock    = importJSON "${src}/npm-shrinkwrap.json";
+let
+  hasSupplemental = builtins.pathExists "${src}/supplemental.nix";
+
+  context = nodenixthingPkgs.mkNpmPackageContext {
+    package      = importJSON "${src}/package.json";
+    lock         = importJSON "${src}/npm-shrinkwrap.json";
+    supplemental = optionalAttrs hasSupplemental (import "${src}/supplemental.nix" { inherit pkgs; });
   };
 in context
