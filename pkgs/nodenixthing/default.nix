@@ -6,7 +6,7 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
   checkPhase = ''
     set -eo pipefail
 
-    export TEST_MODE=true 
+    export TEST_MODE=true
 
     $binary init
 
@@ -109,12 +109,19 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
         PATH=${jq}/bin:${nix}/bin:$PATH
 
         if [[ -e context.json ]]; then
-          contextJSON=context.json
+          ${/* This has to be an absolute path or nix complains */ ""}
+          contextJSON=$PWD/context.json
         else
           contextJSON=$($0 make-context --store)
         fi
 
-        nix-build ${./fetch-context.nix} --no-out-link \
+        if [[ -t 1 ]]; then
+          nixBuild=(nix build --no-link -f)
+        else
+          nixBuild=(nix-build --no-out-link)
+        fi
+
+        exec "''${nixBuild[@]}" ${./fetch-context.nix} \
           --argstr nixpkgs ${pkgs.path} \
           --argstr nodenixthingRoot ${lib.cleanSource ../..} \
           --argstr contextJSON "$contextJSON"
