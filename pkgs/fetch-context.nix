@@ -6,7 +6,7 @@
 with lib;
 with builtins;
 with (callPackage ../lib {});
-with (callPackage ./make-context/dep-map.nix {});
+with (callPackage ../context.nix {});
 let
   fetch = self: super: let
     shouldFetch = hasAttrs [ "resolved" "integrity" ] super;

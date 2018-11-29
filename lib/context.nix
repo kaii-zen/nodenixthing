@@ -2,7 +2,7 @@
 
 with lib;
 with builtins;
-with (callPackage ../../lib {});
+with (callPackage ./. {});
 let
   mkDepMap =
   { package
@@ -67,7 +67,6 @@ let
   removeSelf = filterPackagesWithoutAttr "self";
   removeDev = filterPackages (_: _: { dev ? false, ... }: !dev);
   removeNonDev = filterPackagesWithAttr "dev";
-  # needIntegrity = filterPackages (_: _: attrs: !(attrs ? self) && attrs.integrity == "sha1-0000000000000000000000000000000000000000" && trace attrs true);
   needIntegrity = dm: let
     filtered = filterAttrs (_: versions: {} != versions) (mapAttrs (name: versions: (filterAttrs (version: attrs: !(attrs ? self) && attrs.integrity == "sha1-0000000000000000000000000000000000000000") versions)) dm);
     plucked = mapAttrs (_: versions: mapAttrs (_: attrs: filterAttrs (n: _: n == "integrity") attrs) versions) filtered;

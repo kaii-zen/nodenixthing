@@ -4,7 +4,7 @@
 # until we (hopefully 😅) end up with a flat attrset of inter-dependent derivations.
 with pkgs.lib;
 with (callPackage ../../lib {});
-with (callPackage ./dep-map.nix {});
+with (callPackage ../../lib/context.nix {});
 let
   normalizeInput = self: super: {
     normalizedInput.${self.lock.name} = self.lock // {
