@@ -4,6 +4,7 @@ with pkgs;
 
 mkShell {
   buildInputs = [
+    bashInteractive
     nodejs
     (callPackages ./pkgs {}).nodenixthing
   ];
