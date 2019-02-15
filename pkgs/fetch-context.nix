@@ -11,7 +11,10 @@ let
   fetch = self: super: let
     shouldFetch = hasAttrs [ "resolved" "integrity" ] super;
   in optionalAttrs shouldFetch {
-    npmPackage = npmFetch { inherit (self) name version resolved integrity npmRc; };
+    npmPackage = npmFetch {
+      inherit (self) name version resolved integrity;
+      inherit npmRc;
+    };
   };
 
   extract = callPackage ../extract.nix {};

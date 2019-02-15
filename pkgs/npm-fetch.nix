@@ -1,11 +1,11 @@
 { lib, curl, perl, writeText, stdenvNoCC, nodejs, git, openssh, cacert
 , idRsa ? ""
-, npmRc ? ""
 }:
 
 { resolved
 , integrity
 , name
+, npmRc ? ""
 , version , # Meta information, if any.
   meta ? {}
   # Passthru information, if any.

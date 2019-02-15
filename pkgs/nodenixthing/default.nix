@@ -121,9 +121,12 @@ mkBashCli "nnt" "CLI for working with Nix in NPM projects" {
           nixBuild=(nix-build --no-out-link)
         fi
 
+        cat $HOME/.npmrc
+
         exec "''${nixBuild[@]}" ${./fetch-context.nix} \
           --argstr nixpkgs ${pkgs.path} \
           --argstr nodenixthingRoot ${lib.cleanSource ../..} \
+          --argstr npmRc $HOME/.npmrc \
           --argstr contextJSON "$contextJSON"
       '')
     ]
